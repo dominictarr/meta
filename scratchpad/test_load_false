@@ -1,0 +1,10 @@
+class TestLoadFalse
+
+def false_f
+	false
+end
+def test_load
+	assert !false_f
+end
+
+end

@@ -79,8 +79,24 @@ module TestSL
 				false
 			end
 		end
+ 	
+	 	def create(*params,&block)
+	 		args.first.new(*params,&block)
+	 	end
+ 		def assert_equal (x,y)
+			raise "expected #{x.inspect} got #{y.inspect}" unless x == y
+		end
+ 		def assert_not_nil (x)
+			raise "expected not nil" if x.nil?
+		end
+		def assert_underN(n,pn)
+			c = create(n)
+		#puts "UNDER #{n} #{c}"
+			assert_equal(pn,c.primes)
+		end
+
+ 	end
 	#	def on(&test_block)
 	#		block(test_block)
 	#	end
-	end
 end

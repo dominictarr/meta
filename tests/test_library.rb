@@ -29,7 +29,22 @@ include TestSL
 		assert_equal a,l.couple(g)
 		assert_equal [a,b],l.passes(g)
 	end
-	
+	def test_submit_with_symbol
+	g = test_group(:test_for_true){
+		test(:test_true){
+			args.first == TrueClass
+		}
+	}
+	TestLibrary.const_set(:GTest, g)
+
+		l = Library.new
+		l.submit_test g
+		l.submit TrueClass
+		assert l.tests.include? (GTest)
+		assert l.couple(g)
+		assert l.couple(GTest)
+		assert l.couple(:'TestLibrary::GTest')
+	end
 	include Coupler
 	def test_singleton
 		assert Library.library
@@ -47,6 +62,13 @@ include TestSL
 		l.submit a = Array
 		#assert_equal l,self.__parent 
 		assert_equal Array,couple(g)
+	end
+	
+	def test_submit_requires
+		l = Library.new
+		l.submit_require 'tests/examples/test_require',:TestRequire,:Require
+		assert_equal 	:Require.to_s, l.couple(:TestRequire).name
+	
 	end
 end
 

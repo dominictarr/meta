@@ -1,0 +1,167 @@
+new code diary
+
+july 31.
+
+I completed a simple prototype last sunday.
+
+new focus: NICHE.
+	for small bits of code, using packages is too much hassle. 
+	
+	this gets copy pasted from blogs. not really very good. this is my first niche. 
+	I think this can be done better with my system.
+	
+	got to get this opperation easier than copy pasting all that.
+	
+	just copy and paste one line:
+	
+	couple(:testname_versioncode)
+	
+	submitting should be as simple as well.
+	
+	just add 
+	
+	submit(Class) 
+	
+	to your code. when you run it it will 
+	
+	checkout 
+	Kernel#load
+	
+	okay. the first question is how much work do I need to do currently?
+	
+	okay. 
+	say a simple script which uses primes to print primes between n and m.
+	
+	okay, currently:
+	centrally:
+		add dependant files to couple_all.rb
+		files + tests + 2 lines
+	in project:
+		require couple_all.rb
+		include Coupler
+		require the test depencency
+		couple(TestConstant)
+		(4 lines)
+		
+	in the simple prime number script (including the different primes implementations)
+	8 + 4 = 12 lines.
+	
+	OKAY! get that down as low as possible.
+	use symbols in couple (- drop the require in project)
+	
+	add tests to library in another step.
+	add method to test's file to add to library. 
+	have library store it's requires and classes and load them automaticially... so you only require 'coupler' or 'metamodular'
+	
+	okay. couple can use symbols now, don't need to require in path.
+	thats project:
+				require couple_all.rb
+		include Coupler
+		couple(:TestConstant)
+
+		3 lines... 11 lines total.
+		
+		drop submits from couple_all.rb by adding something to submit classes/tests in class files.
+		
+		then drop requires by saving list of requires in library's file.
+		
+		
+		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		
+		ways to push/pull classes into library:
+		
+		1.like I have now, call a submit method on library. (problem, how to I learn the rb file?)
+		
+		2.submit the .rb file, and take all classes etc from it. (by parsing)
+			- call simple method (from inside .rb) and get all the .rb file from the trace.
+
+		3.submit a file and a manifest of classes. 
+			- load the file and then look for those classes.
+			- upgrade to parse the .rb for the classes.
+			- wrap the file in a module so that each implemention is seperated
+			
+		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		
+		so the library is given a .rb file, and a list of classes.
+		it requires the .rb and checks it now has the classes.
+		it stores the .rb files and classes in a map
+		
+		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		
+		okay. next is saving dependencies to file and reloading them at start up.
+			- that will easily be extendable to being online.
+			.... then change dependency in project to couper rather than coupler_all
+			
+			got it loading, but since coupler maps from tests to classes I have to say Library.library.couple(:test_name) 
+			... I'll need to rewrite coupler to use symbols as well.
+			
+			then expand library into local (caching) library and remote library (which is running in another process...)
+			
+			
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		I've gotted so used to struggling with this difficult problem that it feels weird to be approching a solution.
+		
+		okay, so the goal should be a website for it.
+		what are some compromises that will make this easy?
+		
+			insist on a module - or will this just come out in a test? - maybe could test for clashes by running one test then testing other things.
+			make tests define thier target class. (so will work with any popular test framework)
+			
+		steps:
+			test runner in another ruby instance (so don't mess up the server thread)
+			server
+			local library which caches tests and results and preferences, & communicates with the remote library.
+			
+			and then a website. (ruby on rails...)
+
+			-start with local library which stores test results, then test runner.
+			
+			
+		-----------------------
+		THEN THIS BECOMES A MARKETING PROBLEM
+		-----------------------
+					
+					
+		okay, I've written a simple sandbox,
+		although i'm feeling a little disturbed at how i'm continually using Test::Unit::TestCase. 
+		it's a marginally nicer interface than my test_group thing.
+		
+		so, next: 
+			persistant local library - gotta get this baby running at compile time.
+			then adaptable tests.
+			then port all my recent stuff to use decoupled types.
+			
+			next step is local library which manages couples with symbols. porting to this isn't as simple as it sounds. 
+			it means a rewrite. retest. hell, the original one i wrote in hours so it cant be that complicated.
+			
+			I want something which will allow lazy require. only require when something is first initialized. 
+				but not when it is couplexed.
+				
+			i'll need some place to store the requires necessary for each class. that way, 
+			they can be required when you need them 
+			specifying requires during couplex is wrong.
+			
+			it's just a hash -> set which checks if it's already required. (or just goes with the fact that it's already loaded.)
+			
+			okay. Depends is written (Depends < to spell than Dependencies)
+			
+			right. didn't Library have something todo with require?
+				def submit_require(required,*items)
+					stores items
+					and require required
+					maps @requires[required] = [*items]
+				
+				right, shouldn't it be the other way around? klass -> *requires
+				
+				library depends on coupler. what is the way forward? a coupler which uses depends?
+				
+				all i want it a coupler which takes symbols. it will depend on depends.
+				
+				
+			we have coupler2, which uses symbols.
+			havn't tested it with depends,
+			and I've taken out the ClassCoupler... 
+			which required monkeypatching, and, I think i'll need it, but I don't actually have use case yet.
+			
+			I should probably go home and get some sleep though. just make a failing test.
+			

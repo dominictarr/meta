@@ -71,6 +71,7 @@ class TestCoupler < Test::Unit::TestCase
 		#puts "==  #{c == CoupleMe}"
 		#puts "eql? #{c.eql? CoupleMe}"
 		#assert_equal CoupleMe,c
+
 		assert c.__wrapped__
 
 		assert_equal c, CoupleMe, "want to fool ==" #there are a few tricks here. will have to redefine some == methods on Class.
@@ -136,8 +137,50 @@ class TestCoupler < Test::Unit::TestCase
 		assert_equal CoupleMe, couple(TestCoupleable).couple(TestCoupleable).couple(Test7).couple(TestCoupleable)
 
 		#now i'm ready to make the test library.		
-		
 	end
+
+	def test_defaults_by_symbol
+	self.class.send(:include,Coupler)
+		couplex(Test7,Seven)
+		couplex(TestCoupleable,CoupleMe)
+		assert_equal Seven, couple(:'TestCoupler::Test7')
+		assert_equal CoupleMe, couple(:'TestCoupler::TestCoupleable')
+		couplex(Test7,Seven){
+			couplex(Test7,7)
+		}
+		assert_equal Seven, couple(:'TestCoupler::Test7')
+		assert_equal CoupleMe, couple(:'TestCoupler::TestCoupleable')
+		assert_equal 7, couple(:'TestCoupler::Test7').couple(:'TestCoupler::Test7')
+
+		#okay, now self has a couplex for TestCoupleable
+		#but Seven doesn't. it should default to what Seven uses
+		#because it's it's parent
+		assert couple(:'TestCoupler::Test7').__parent
+		#puts "PARENT"
+		#puts couple(Test7).__parent
+		#assert !couple(CoupleMe).__parent
+
+		assert_equal CoupleMe, couple(:'TestCoupler::Test7').couple(:'TestCoupler::TestCoupleable')
+		assert_equal Seven, couple(:'TestCoupler::TestCoupleable').couple(:'TestCoupler::Test7')
+		assert_equal 7, couple(:'TestCoupler::TestCoupleable').couple(:'TestCoupler::Test7').couple(:'TestCoupler::Test7')
+		assert_equal CoupleMe, couple(:'TestCoupler::TestCoupleable').
+										couple(:'TestCoupler::TestCoupleable').
+										couple(:'TestCoupler::Test7').
+										couple(:'TestCoupler::TestCoupleable')
+
+		#now i'm ready to make the test library.		
+	end
+
+	
+	def test_couple_by_symbol
+	self.class.send(:include,Coupler)
+		couplex(Test7,Seven)
+		couplex(TestCoupleable,CoupleMe)
+
+		assert_equal Seven,couple(:'TestCoupler::Test7')
+		assert_equal CoupleMe,couple(:'TestCoupler::TestCoupleable')
+	end
+	
 end
 	
 
